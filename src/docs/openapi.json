@@ -1,0 +1,27 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "SIGECAP API", "version": "0.1.0", "description": "API REST del sistema de gestión de cursos de capacitación de la CNBBBJ Oaxaca" },
+  "servers": [{ "url": "/api/v1" }],
+  "components": {
+    "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } }
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Inicia sesión con correo institucional o CURP",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": {
+          "type": "object", "required": ["identificador", "contrasena"],
+          "properties": { "identificador": { "type": "string", "example": "admin@ejemplo.gob.mx" }, "contrasena": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "Token JWT y datos del usuario" }, "401": { "description": "Credenciales incorrectas" } }
+      }
+    },
+    "/auth/me": { "get": { "tags": ["Autenticación"], "summary": "Usuario autenticado", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "OK" } } } },
+    "/empleados": {
+      "get": { "tags": ["Empleados"], "summary": "Lista y busca empleados", "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "buscar", "in": "query", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" } } },
+      "post": { "tags": ["Empleados"], "summary": "Alta de empleado (CURP obligatoria)", "security": [{ "bearerAuth": [] }], "responses": { "201": { "description": "Creado" }, "400": { "description": "Datos inválidos" } } }
+    }
+  }
+}
