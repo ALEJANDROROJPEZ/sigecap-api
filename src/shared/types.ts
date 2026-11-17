@@ -6,6 +6,13 @@ export interface UsuarioToken {
   rol: RolNombre;
 }
 
+export interface Paginado<T> {
+  total: number;
+  pagina: number;
+  porPagina: number;
+  datos: T[];
+}
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
