@@ -4,4 +4,5 @@ dist/
 uploads/*
 !uploads/.gitkeep
 src/config/prisma-client/
+firestore-export/
 *.log

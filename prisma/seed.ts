@@ -3,6 +3,7 @@ import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/config/prisma-client/client.js';
+import { PLANTILLAS } from '../src/shared/templates/index.js';
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }) });
 
@@ -19,7 +20,7 @@ async function main() {
     where: { clave: 'ORE-OAX' }, update: {},
     create: { clave: 'ORE-OAX', nombre: 'Oficina de Representación Estatal Oaxaca', tipo: 'ORE' },
   });
-  // TODO: agregar aquí las SARE del estado (clave, nombre, tipo: 'SARE')
+  // Las SARE del estado y los temas del Comité de Ética se capturan desde el sistema (Catálogos)
 
   for (const [siglas, nombre] of [
     ['INMUJERES', 'Instituto Nacional de las Mujeres'],
@@ -27,6 +28,13 @@ async function main() {
     ['EBG', 'Escuela del Buen Gobierno'],
   ]) {
     await prisma.dependencia.upsert({ where: { siglas }, update: { nombre }, create: { siglas, nombre } });
+  }
+
+  // Plantillas de correo: solo se crean si no existen, para conservar los cambios hechos desde el sistema
+  for (const p of Object.values(PLANTILLAS)) {
+    await prisma.plantillaCorreo.upsert({
+      where: { nombre: p.nombre }, update: {}, create: { nombre: p.nombre, asunto: p.asunto, cuerpoHtml: p.cuerpoHtml },
+    });
   }
 
   const e = process.env;

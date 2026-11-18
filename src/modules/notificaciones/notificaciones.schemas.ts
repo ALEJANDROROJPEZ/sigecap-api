@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { BOOL_QUERY, paginacion } from '../../shared/validaciones.js';
 
-// TODO: definir los esquemas de validación de notificaciones
-export const crearNotificacionSchema = z.object({});
+export const listarNotificacionesSchema = z.object({
+  soloNoLeidas: BOOL_QUERY,
+  ...paginacion,
+});

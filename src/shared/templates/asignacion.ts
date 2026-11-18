@@ -1,11 +1,14 @@
-export function plantillaAsignacion(nombre: string, curso: string, fechaLimite?: string, url?: string) {
-  return `
-  <div style="font-family:Arial,sans-serif;max-width:560px">
-    <h2 style="color:#1F3864">Nuevo curso asignado</h2>
-    <p>Hola ${nombre}:</p>
-    <p>Se te asignó el curso <strong>${curso}</strong>.</p>
-    ${fechaLimite ? `<p>Fecha límite para entregar tu constancia: <strong>${fechaLimite}</strong>.</p>` : ''}
-    ${url ? `<p><a href="${url}">Ir a la plataforma del curso</a></p>` : ''}
-    <p>Área de Capacitación · CNBBBJ Oaxaca</p>
-  </div>`;
-}
+import { boton, envolver, type PlantillaPredeterminada } from './base.js';
+
+export const plantillaAsignacion: PlantillaPredeterminada = {
+  nombre: 'ASIGNACION',
+  asunto: 'Nuevo curso asignado: {{curso}}',
+  variables: ['nombre', 'curso', 'dependencia', 'trimestre', 'fechaLimite', 'urlCurso', 'urlSistema'],
+  cuerpoHtml: envolver('Nuevo curso asignado', `
+    <p>Hola {{nombre}}:</p>
+    <p>Se te asignó el curso <strong>{{curso}}</strong>, impartido por {{dependencia}} ({{trimestre}}).</p>
+    <p>Fecha límite para entregar tu constancia: <strong>{{fechaLimite}}</strong>.</p>
+    <p>Plataforma del curso: {{urlCurso}}</p>
+    <p>Al concluirlo, sube tu constancia en PDF desde la sección «Mis cursos».</p>
+    ${boton('{{urlSistema}}', 'Ir a SIGECAP')}`),
+};
