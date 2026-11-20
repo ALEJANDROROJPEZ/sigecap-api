@@ -1,5 +1,5 @@
 import { prisma } from '../../config/prisma.js';
-import { enviarCorreo, mailer } from '../../config/mailer.js';
+import { enviarCorreo } from '../../config/mailer.js';
 import { HttpError } from '../../shared/http-error.js';
 import { saltar } from '../../shared/validaciones.js';
 import { PLANTILLAS, renderizar, type NombrePlantilla } from '../../shared/templates/index.js';
@@ -70,12 +70,23 @@ export async function listarEnvios(pagina: number, porPagina: number) {
   return { total, pagina, porPagina, datos };
 }
 
-// Comprueba la conexión SMTP y envía un mensaje de prueba
+// Comprueba la conexión SMTP y envía un mensaje de prueba (acepta cualquier dominio/proveedor)
 export async function probar(para: string) {
   try {
-    await mailer.verify();
-    await enviarCorreo(para, 'Prueba de correo de SIGECAP', '<p>La configuración de correo de SIGECAP funciona correctamente.</p>');
-    return { ok: true, mensaje: `Correo de prueba enviado a ${para}` };
+    const resultado = await enviarCorreo(
+      para,
+      'Prueba de correo de SIGECAP',
+      '<p>La configuración de correo de SIGECAP funciona correctamente.</p>',
+    );
+    const detalleModo = resultado.modoPrueba
+      ? ` (enviado en modo de prueba vía ${resultado.servidor}; configura tus credenciales SMTP en .env para salida real)`
+      : ` (enviado vía ${resultado.servidor})`;
+    return {
+      ok: true,
+      mensaje: `Correo de prueba enviado a ${para}${detalleModo}`,
+      modoPrueba: resultado.modoPrueba,
+      urlVistaPrevia: resultado.urlVistaPrevia,
+    };
   } catch (err) {
     return { ok: false, mensaje: `No se pudo enviar: ${(err as Error).message}` };
   }
